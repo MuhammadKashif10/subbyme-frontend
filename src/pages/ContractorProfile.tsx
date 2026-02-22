@@ -1,11 +1,11 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { MapPin, MessageSquare, Clock, ArrowLeft, Calendar, Loader2, LogIn, Heart } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { RatingStars } from "@/components/RatingStars";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { Button } from "@/components/ui/button";
-import { useUser, useUserReviews, useSaveContractor, useUnsaveContractor } from "@/hooks/use-api";
+import { useUser, useUserReviews, useSaveContractor, useUnsaveContractor, useCreateConversation } from "@/hooks/use-api";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import type { User as UserType } from "@/lib/types";
@@ -18,6 +18,8 @@ export default function ContractorProfile() {
   const { data: reviewsData } = useUserReviews(id);
   const saveContractor = useSaveContractor();
   const unsaveContractor = useUnsaveContractor();
+  const createConversation = useCreateConversation();
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   const reviews = reviewsData?.reviews ?? [];
@@ -104,7 +106,27 @@ export default function ContractorProfile() {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Button size="lg"><MessageSquare size={16} className="mr-2" /> Message</Button>
+              <Button
+                size="lg"
+                onClick={async () => {
+                  if (!id) return;
+                  try {
+                    const conv = await createConversation.mutateAsync({
+                      participantId: id,
+                    });
+                    navigate(`/messages?c=${conv._id}`);
+                  } catch (e) {
+                    toast({
+                      title: "Could not start chat",
+                      description: String(e),
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                disabled={createConversation.isPending}
+              >
+                <MessageSquare size={16} className="mr-2" /> Message
+              </Button>
               {isClient && (
                 <Button
                   size="lg"

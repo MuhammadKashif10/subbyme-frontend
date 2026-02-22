@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
+import { SocketProvider } from "@/context/SocketContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 import Index from "./pages/Index";
@@ -22,6 +23,7 @@ import ClientPayments from "./pages/client/ClientPayments";
 import ClientSaved from "./pages/client/ClientSaved";
 import ClientReviews from "./pages/client/ClientReviews";
 import ClientSettings from "./pages/client/ClientSettings";
+import Messages from "./pages/Messages";
 
 import ContractorOverview from "./pages/contractor/ContractorOverview";
 import ContractorEditProfile from "./pages/contractor/ContractorEditProfile";
@@ -31,6 +33,7 @@ import ContractorApplications from "./pages/contractor/ContractorApplications";
 import ContractorEarnings from "./pages/contractor/ContractorEarnings";
 import ContractorReviews from "./pages/contractor/ContractorReviews";
 import ContractorSettings from "./pages/contractor/ContractorSettings";
+import ContractorAvailability from "./pages/contractor/ContractorAvailability";
 
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -41,6 +44,7 @@ import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminReviews from "./pages/admin/AdminReviews";
 import AdminCategories from "./pages/admin/AdminCategories";
+import AdminTrades from "./pages/admin/AdminTrades";
 import AdminSettings from "./pages/admin/AdminSettings";
 
 const queryClient = new QueryClient({
@@ -56,6 +60,7 @@ const queryClient = new QueryClient({
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+      <SocketProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -69,6 +74,7 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/payment/success" element={<PaymentSuccess />} />
             <Route path="/payment/cancel" element={<PaymentCancel />} />
+            <Route path="/messages" element={<ProtectedRoute allowedRoles={["client", "contractor"]}><Messages /></ProtectedRoute>} />
 
             {/* Client Dashboard */}
             <Route path="/dashboard/client" element={<ProtectedRoute allowedRoles={["client"]}><ClientOverview /></ProtectedRoute>} />
@@ -87,6 +93,7 @@ const App = () => (
             <Route path="/dashboard/contractor/subscription" element={<ProtectedRoute allowedRoles={["contractor"]}><ContractorSubscription /></ProtectedRoute>} />
             <Route path="/dashboard/contractor/earnings" element={<ProtectedRoute allowedRoles={["contractor"]}><ContractorEarnings /></ProtectedRoute>} />
             <Route path="/dashboard/contractor/reviews" element={<ProtectedRoute allowedRoles={["contractor"]}><ContractorReviews /></ProtectedRoute>} />
+            <Route path="/dashboard/contractor/availability" element={<ProtectedRoute allowedRoles={["contractor"]}><ContractorAvailability /></ProtectedRoute>} />
             <Route path="/dashboard/contractor/settings" element={<ProtectedRoute allowedRoles={["contractor"]}><ContractorSettings /></ProtectedRoute>} />
 
             {/* Admin */}
@@ -99,12 +106,14 @@ const App = () => (
             <Route path="/admin/payments" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPayments /></ProtectedRoute>} />
             <Route path="/admin/reviews" element={<ProtectedRoute allowedRoles={["admin"]}><AdminReviews /></ProtectedRoute>} />
             <Route path="/admin/categories" element={<ProtectedRoute allowedRoles={["admin"]}><AdminCategories /></ProtectedRoute>} />
+            <Route path="/admin/trades" element={<ProtectedRoute allowedRoles={["admin"]}><AdminTrades /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSettings /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
+      </SocketProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

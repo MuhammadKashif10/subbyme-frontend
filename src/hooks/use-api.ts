@@ -7,6 +7,11 @@ import { adminService } from "@/services/admin.service";
 import { paymentsService } from "@/services/payments.service";
 import { categoriesService } from "@/services/categories.service";
 import { authService } from "@/services/auth.service";
+import { conversationsService } from "@/services/conversations.service";
+import { messagesService } from "@/services/messages.service";
+import { notificationsService } from "@/services/notifications.service";
+import { tradesService } from "@/services/trades.service";
+import { availabilityService } from "@/services/availability.service";
 
 // ── Contractors / Users ──
 export function useContractors(params: ContractorSearchParams = {}) {
@@ -466,6 +471,221 @@ export function useDeleteCategory() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["categories"] });
       qc.invalidateQueries({ queryKey: ["categories-all"] });
+    },
+  });
+}
+
+// ── Conversations / Messages ──
+export function useConversations(page = 1, limit = 20) {
+  return useQuery({
+    queryKey: ["conversations", page, limit],
+    queryFn: () => conversationsService.getMine(page, limit),
+  });
+}
+
+export function useConversation(id: string | undefined) {
+  return useQuery({
+    queryKey: ["conversation", id],
+    queryFn: () => conversationsService.getById(id!),
+    enabled: !!id,
+  });
+}
+
+export function useCreateConversation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { participantId: string; jobId?: string }) =>
+      conversationsService.create(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+    },
+  });
+}
+
+export function useConversationUnreadCount() {
+  return useQuery({
+    queryKey: ["conversation-unread"],
+    queryFn: () => conversationsService.getUnreadCount(),
+  });
+}
+
+export function useMessages(conversationId: string | undefined, page = 1) {
+  return useQuery({
+    queryKey: ["messages", conversationId, page],
+    queryFn: () => messagesService.getByConversation(conversationId!, page),
+    enabled: !!conversationId,
+  });
+}
+
+export function useSendMessage() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      conversationId,
+      text,
+      attachments,
+    }: {
+      conversationId: string;
+      text?: string;
+      attachments?: File[];
+    }) => messagesService.create({ conversationId, text }, attachments),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ["messages", vars.conversationId] });
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+      qc.invalidateQueries({ queryKey: ["conversation-unread"] });
+    },
+  });
+}
+
+export function useMarkMessagesRead() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      conversationId,
+      messageIds,
+    }: {
+      conversationId: string;
+      messageIds?: string[];
+    }) => messagesService.markAsRead(conversationId, messageIds),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ["messages", vars.conversationId] });
+      qc.invalidateQueries({ queryKey: ["conversation-unread"] });
+    },
+  });
+}
+
+// ── Notifications ──
+export function useNotifications(page = 1, limit = 20) {
+  return useQuery({
+    queryKey: ["notifications", page, limit],
+    queryFn: () => notificationsService.getMine(page, limit),
+  });
+}
+
+export function useNotificationUnreadCount() {
+  return useQuery({
+    queryKey: ["notification-unread"],
+    queryFn: () => notificationsService.getUnreadCount(),
+  });
+}
+
+export function useMarkNotificationRead() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => notificationsService.markAsRead(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["notifications"] });
+      qc.invalidateQueries({ queryKey: ["notification-unread"] });
+    },
+  });
+}
+
+export function useMarkAllNotificationsRead() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => notificationsService.markAllAsRead(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["notifications"] });
+      qc.invalidateQueries({ queryKey: ["notification-unread"] });
+    },
+  });
+}
+
+// ── Trades ──
+export function useTrades() {
+  return useQuery({
+    queryKey: ["trades"],
+    queryFn: () => tradesService.getAll(),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useTrade(id: string | undefined) {
+  return useQuery({
+    queryKey: ["trade", id],
+    queryFn: () => tradesService.getById(id!),
+    enabled: !!id,
+  });
+}
+
+export function useCreateTrade() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => tradesService.create(name),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["trades"] }),
+  });
+}
+
+export function useUpdateTrade() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) =>
+      tradesService.update(id, name),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["trades"] }),
+  });
+}
+
+export function useDeleteTrade() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => tradesService.delete(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["trades"] }),
+  });
+}
+
+export function useAddSubcategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ tradeId, name }: { tradeId: string; name: string }) =>
+      tradesService.addSubcategory(tradeId, name),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["trades"] }),
+  });
+}
+
+export function useRemoveSubcategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ tradeId, slug }: { tradeId: string; slug: string }) =>
+      tradesService.removeSubcategory(tradeId, slug),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["trades"] }),
+  });
+}
+
+// ── Availability ──
+export function useMyAvailability() {
+  return useQuery({
+    queryKey: ["my-availability"],
+    queryFn: () => availabilityService.getMine(),
+  });
+}
+
+export function useContractorAvailability(contractorId: string | undefined) {
+  return useQuery({
+    queryKey: ["contractor-availability", contractorId],
+    queryFn: () => availabilityService.getByContractor(contractorId!),
+    enabled: !!contractorId,
+  });
+}
+
+export function useAddUnavailableDates() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (dates: string[]) => availabilityService.addUnavailableDates(dates),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-availability"] });
+      qc.invalidateQueries({ queryKey: ["contractor-availability"] });
+    },
+  });
+}
+
+export function useRemoveUnavailableDates() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (dates: string[]) =>
+      availabilityService.removeUnavailableDates(dates),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-availability"] });
+      qc.invalidateQueries({ queryKey: ["contractor-availability"] });
     },
   });
 }

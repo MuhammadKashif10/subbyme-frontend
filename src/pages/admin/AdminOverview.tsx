@@ -17,6 +17,7 @@ const navItems = [
   { label: "Payments", path: "/admin/payments", icon: DollarSign },
   { label: "Reviews", path: "/admin/reviews", icon: Star },
   { label: "Categories", path: "/admin/categories", icon: FolderTree },
+  { label: "Trades", path: "/admin/trades", icon: Tag },
   { label: "Settings", path: "/admin/settings", icon: Settings },
 ];
 

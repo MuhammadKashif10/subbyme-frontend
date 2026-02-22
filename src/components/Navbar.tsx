@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, MessageSquare } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "./ui/button";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -40,6 +41,10 @@ export function Navbar() {
           {isAuthenticated && user ? (
             <>
               <Button asChild variant="ghost" size="sm">
+                <Link to="/messages"><MessageSquare size={16} className="mr-1" /> Messages</Link>
+              </Button>
+              <NotificationDropdown />
+              <Button asChild variant="ghost" size="sm">
                 <Link to={dashboardPath}><User size={16} className="mr-1" /> Dashboard</Link>
               </Button>
               <span className="text-sm text-muted-foreground">{user.name}</span>
@@ -71,6 +76,10 @@ export function Navbar() {
             ))}
             {isAuthenticated ? (
               <>
+                <Link to="/messages" onClick={() => setMobileOpen(false)} className="text-sm font-medium px-3 py-2 rounded-md text-muted-foreground hover:bg-secondary flex items-center gap-2">
+                  <MessageSquare size={16} /> Messages
+                </Link>
+                <div className="px-3 py-2"><NotificationDropdown /></div>
                 <Link to={dashboardPath} onClick={() => setMobileOpen(false)} className="text-sm font-medium px-3 py-2 rounded-md text-muted-foreground hover:bg-secondary">Dashboard</Link>
                 <Button variant="outline" size="sm" onClick={() => { logout(); setMobileOpen(false); }}>Logout</Button>
               </>

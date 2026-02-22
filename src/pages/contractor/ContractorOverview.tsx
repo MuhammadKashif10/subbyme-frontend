@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, UserCog, CreditCard, FileCheck, Briefcase, DollarSign, Star, Settings, ShieldCheck,
+  LayoutDashboard, UserCog, CreditCard, FileCheck, Briefcase, DollarSign, Star, Settings, ShieldCheck, Calendar,
 } from "lucide-react";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { StatsCard } from "@/components/StatsCard";
@@ -19,6 +19,7 @@ const navItems = [
   { label: "Subscription", path: "/dashboard/contractor/subscription", icon: CreditCard },
   { label: "Earnings", path: "/dashboard/contractor/earnings", icon: DollarSign },
   { label: "Reviews", path: "/dashboard/contractor/reviews", icon: Star },
+  { label: "Availability", path: "/dashboard/contractor/availability", icon: Calendar },
   { label: "Settings", path: "/dashboard/contractor/settings", icon: Settings },
 ];
 
