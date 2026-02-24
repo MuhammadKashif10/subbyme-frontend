@@ -15,6 +15,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
+import Contact from "./pages/Contact";
 
 import ClientOverview from "./pages/client/ClientOverview";
 import ClientListings from "./pages/client/ClientListings";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/payment/success" element={<PaymentSuccess />} />
             <Route path="/payment/cancel" element={<PaymentCancel />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/messages" element={<ProtectedRoute allowedRoles={["client", "contractor"]}><Messages /></ProtectedRoute>} />
 
             {/* Client Dashboard */}

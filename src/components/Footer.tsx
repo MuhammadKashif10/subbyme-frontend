@@ -17,6 +17,7 @@ export function Footer() {
             <div className="flex flex-col gap-2 text-sm text-muted-foreground">
               <Link to="/" className="hover:text-primary transition-colors">Home</Link>
               <Link to="/contractors" className="hover:text-primary transition-colors">Find Contractors</Link>
+              <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
               <Link to="/register" className="hover:text-primary transition-colors">Sign Up</Link>
             </div>
           </div>

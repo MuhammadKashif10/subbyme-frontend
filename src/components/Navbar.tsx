@@ -8,6 +8,7 @@ import { NotificationDropdown } from "./NotificationDropdown";
 const navLinks = [
   { label: "Home", path: "/" },
   { label: "Find Contractors", path: "/contractors" },
+  { label: "Contact", path: "/contact" },
 ];
 
 export function Navbar() {
