@@ -26,9 +26,27 @@ export interface ContractorEarnings {
   pendingEscrow: number;
 }
 
+export interface ValidatePromoResult {
+  valid: boolean;
+  promoCodeId?: string;
+  code?: string;
+  discountType?: "percentage" | "free_time";
+  discountValue?: number;
+  originalAmount: number;
+  discountedAmount: number;
+  discountAmount: number;
+  extraTrialDays?: number;
+  error?: string;
+}
+
 export const paymentsService = {
-  async createSubscription(plan: "standard" | "premium"): Promise<{ url: string }> {
-    const res = await apiClient.post("/payments/create-subscription", { plan });
+  async validatePromo(code: string, plan: "standard" | "premium"): Promise<ValidatePromoResult> {
+    const res = await apiClient.post("/payments/validate-promo", { code, plan });
+    return unwrap(res);
+  },
+
+  async createSubscription(plan: "standard" | "premium", promoCodeId?: string): Promise<{ url: string }> {
+    const res = await apiClient.post("/payments/create-subscription", { plan, promoCodeId });
     return unwrap(res);
   },
 

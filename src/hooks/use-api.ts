@@ -326,6 +326,45 @@ export function useAdminDeleteReview() {
   });
 }
 
+export function useAdminPromoCodes(page = 1, limit = 20) {
+  return useQuery({
+    queryKey: ["admin-promo-codes", page, limit],
+    queryFn: () => adminService.getPromoCodes({ page, limit }),
+  });
+}
+
+export function useCreatePromoCode() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: import("@/services/admin.service").CreatePromoCodeData) =>
+      adminService.createPromoCode(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-promo-codes"] });
+    },
+  });
+}
+
+export function useUpdatePromoCode() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: import("@/services/admin.service").UpdatePromoCodeData }) =>
+      adminService.updatePromoCode(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-promo-codes"] });
+    },
+  });
+}
+
+export function useDeletePromoCode() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => adminService.deletePromoCode(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-promo-codes"] });
+    },
+  });
+}
+
 export function useUploadProfileImage() {
   const qc = useQueryClient();
   return useMutation({
@@ -374,7 +413,15 @@ export function useMyTransactions() {
 
 export function useCreateSubscription() {
   return useMutation({
-    mutationFn: (plan: "standard" | "premium") => paymentsService.createSubscription(plan),
+    mutationFn: ({ plan, promoCodeId }: { plan: "standard" | "premium"; promoCodeId?: string }) =>
+      paymentsService.createSubscription(plan, promoCodeId),
+  });
+}
+
+export function useValidatePromo() {
+  return useMutation({
+    mutationFn: ({ code, plan }: { code: string; plan: "standard" | "premium" }) =>
+      paymentsService.validatePromo(code, plan),
   });
 }
 

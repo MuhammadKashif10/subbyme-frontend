@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +7,8 @@ import { contractorNavItems } from "./ContractorOverview";
 import { useSubscriptionStatus, useCreateSubscription, useUpgradeQualification, useMyTransactions } from "@/hooks/use-api";
 import { useToast } from "@/hooks/use-toast";
 import { getApiError } from "@/context/AuthContext";
+import { PromoCodeApply } from "@/components/PromoCodeApply";
+import type { ValidatePromoResult } from "@/services/payments.service";
 
 export default function ContractorSubscription() {
   const { data: subStatus, isLoading } = useSubscriptionStatus();
@@ -13,13 +16,16 @@ export default function ContractorSubscription() {
   const subscribe = useCreateSubscription();
   const upgrade = useUpgradeQualification();
   const { toast } = useToast();
+  const [appliedPromoStandard, setAppliedPromoStandard] = useState<ValidatePromoResult | null>(null);
+  const [appliedPromoPremium, setAppliedPromoPremium] = useState<ValidatePromoResult | null>(null);
 
   const currentPlan = subStatus?.plan;
   const subActive = subStatus?.status === "active" || subStatus?.status === "trialing";
 
   const handleSubscribe = async (plan: "standard" | "premium") => {
     try {
-      const { url } = await subscribe.mutateAsync(plan);
+      const promo = plan === "standard" ? appliedPromoStandard : appliedPromoPremium;
+      const { url } = await subscribe.mutateAsync({ plan, promoCodeId: promo?.valid ? promo.promoCodeId : undefined });
       window.location.href = url;
     } catch (error) {
       toast({ title: "Error", description: getApiError(error), variant: "destructive" });
@@ -76,6 +82,16 @@ export default function ContractorSubscription() {
               </li>
             ))}
           </ul>
+          {currentPlan !== "standard" && (
+            <div className="mt-4">
+              <PromoCodeApply
+                plan="standard"
+                appliedResult={appliedPromoStandard}
+                onApplied={setAppliedPromoStandard}
+                onRemove={() => setAppliedPromoStandard(null)}
+              />
+            </div>
+          )}
           {currentPlan === "standard" ? (
             <Button variant="outline" className="mt-6 w-full" disabled>Current Plan</Button>
           ) : (
@@ -85,7 +101,7 @@ export default function ContractorSubscription() {
               disabled={subscribe.isPending}
             >
               {subscribe.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {subActive ? "Switch to Standard" : "Subscribe — $10/week"}
+              {subActive ? "Switch to Standard" : appliedPromoStandard?.valid ? `Subscribe — $${((appliedPromoStandard.discountedAmount ?? 1000) / 100).toFixed(2)}/week` : "Subscribe — $10/week"}
             </Button>
           )}
         </div>
@@ -105,6 +121,16 @@ export default function ContractorSubscription() {
               </li>
             ))}
           </ul>
+          {currentPlan !== "premium" && (
+            <div className="mt-4">
+              <PromoCodeApply
+                plan="premium"
+                appliedResult={appliedPromoPremium}
+                onApplied={setAppliedPromoPremium}
+                onRemove={() => setAppliedPromoPremium(null)}
+              />
+            </div>
+          )}
           {currentPlan === "premium" ? (
             <Button variant="outline" className="mt-6 w-full" disabled>Current Plan</Button>
           ) : (
@@ -114,7 +140,7 @@ export default function ContractorSubscription() {
               disabled={subscribe.isPending}
             >
               {subscribe.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {currentPlan === "standard" ? "Upgrade to Premium" : "Subscribe — $25/week"}
+              {currentPlan === "standard" ? "Upgrade to Premium" : appliedPromoPremium?.valid ? `Subscribe — $${((appliedPromoPremium.discountedAmount ?? 2500) / 100).toFixed(2)}/week` : "Subscribe — $25/week"}
             </Button>
           )}
         </div>

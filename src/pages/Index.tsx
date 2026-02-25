@@ -3,6 +3,8 @@ import { HeroSearch } from "@/components/HeroSearch";
 import { ContractorCard } from "@/components/ContractorCard";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { HowItWorks } from "@/components/HowItWorks";
+import { FAQ } from "@/components/FAQ";
 import { useContractors, useCategories } from "@/hooks/use-api";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -81,6 +83,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      <HowItWorks />
+      <FAQ />
 
       <section className="py-16">
         <div className="container-main text-center">

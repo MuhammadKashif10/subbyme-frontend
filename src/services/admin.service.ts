@@ -69,4 +69,59 @@ export const adminService = {
     const res = await apiClient.delete(`/admin/users/${userId}/profile-image`);
     return unwrap(res);
   },
+
+  async getPromoCodes(params: { page?: number; limit?: number } = {}): Promise<{ promoCodes: PromoCode[]; total: number; page: number; limit: number }> {
+    const res = await apiClient.get("/admin/promo-codes", { params });
+    return unwrap(res);
+  },
+
+  async getPromoCodeById(id: string): Promise<PromoCode> {
+    const res = await apiClient.get(`/admin/promo-codes/${id}`);
+    return unwrap(res);
+  },
+
+  async createPromoCode(data: CreatePromoCodeData): Promise<PromoCode> {
+    const res = await apiClient.post("/admin/promo-codes", data);
+    return unwrap(res);
+  },
+
+  async updatePromoCode(id: string, data: UpdatePromoCodeData): Promise<PromoCode> {
+    const res = await apiClient.patch(`/admin/promo-codes/${id}`, data);
+    return unwrap(res);
+  },
+
+  async deletePromoCode(id: string): Promise<void> {
+    await apiClient.delete(`/admin/promo-codes/${id}`);
+  },
 };
+
+export interface PromoCode {
+  _id: string;
+  code: string;
+  discountType: "percentage" | "free_time";
+  discountValue: number;
+  expiryDate: string;
+  usageLimit: number | null;
+  usedCount: number;
+  isActive: boolean;
+  createdBy?: { _id: string; name: string; email: string };
+  createdAt?: string;
+}
+
+export interface CreatePromoCodeData {
+  code: string;
+  discountType: "percentage" | "free_time";
+  discountValue: number;
+  expiryDate: string;
+  usageLimit?: number | null;
+  isActive?: boolean;
+}
+
+export interface UpdatePromoCodeData {
+  code?: string;
+  discountType?: "percentage" | "free_time";
+  discountValue?: number;
+  expiryDate?: string;
+  usageLimit?: number | null;
+  isActive?: boolean;
+}

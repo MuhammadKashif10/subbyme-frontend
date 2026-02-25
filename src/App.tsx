@@ -47,6 +47,7 @@ import AdminReviews from "./pages/admin/AdminReviews";
 import AdminCategories from "./pages/admin/AdminCategories";
 import AdminTrades from "./pages/admin/AdminTrades";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminPromoCodes from "./pages/admin/AdminPromoCodes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -105,6 +106,7 @@ const App = () => (
             <Route path="/admin/applications" element={<ProtectedRoute allowedRoles={["admin"]}><AdminApplications /></ProtectedRoute>} />
             <Route path="/admin/verifications" element={<ProtectedRoute allowedRoles={["admin"]}><AdminVerifications /></ProtectedRoute>} />
             <Route path="/admin/subscriptions" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSubscriptions /></ProtectedRoute>} />
+            <Route path="/admin/promo-codes" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPromoCodes /></ProtectedRoute>} />
             <Route path="/admin/payments" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPayments /></ProtectedRoute>} />
             <Route path="/admin/reviews" element={<ProtectedRoute allowedRoles={["admin"]}><AdminReviews /></ProtectedRoute>} />
             <Route path="/admin/categories" element={<ProtectedRoute allowedRoles={["admin"]}><AdminCategories /></ProtectedRoute>} />

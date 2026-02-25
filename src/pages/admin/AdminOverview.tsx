@@ -14,6 +14,7 @@ const navItems = [
   { label: "Applications", path: "/admin/applications", icon: FileText },
   { label: "Verifications", path: "/admin/verifications", icon: ShieldCheck },
   { label: "Subscriptions", path: "/admin/subscriptions", icon: CreditCard },
+  { label: "Promo Codes", path: "/admin/promo-codes", icon: Tag },
   { label: "Payments", path: "/admin/payments", icon: DollarSign },
   { label: "Reviews", path: "/admin/reviews", icon: Star },
   { label: "Categories", path: "/admin/categories", icon: FolderTree },
