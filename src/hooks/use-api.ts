@@ -5,6 +5,7 @@ import { applicationsService, type CreateApplicationData } from "@/services/appl
 import { reviewsService, type CreateReviewData } from "@/services/reviews.service";
 import { adminService } from "@/services/admin.service";
 import { verificationAdminService } from "@/services/verification-admin.service";
+import { verificationService } from "@/services/verification.service";
 import { paymentsService } from "@/services/payments.service";
 import { categoriesService } from "@/services/categories.service";
 import { authService } from "@/services/auth.service";
@@ -259,6 +260,26 @@ export function useSetUserVerified() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-users"] });
       qc.invalidateQueries({ queryKey: ["admin-stats"] });
+    },
+  });
+}
+
+// ── Verification (Contractor) ──
+export function useMyVerificationDocs() {
+  return useQuery({
+    queryKey: ["my-verification-docs"],
+    queryFn: () => verificationService.getMyDocuments(),
+  });
+}
+
+export function useUploadVerificationDoc() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ type, file }: { type: import("@/services/verification.service").VerificationDocumentType; file: File }) =>
+      verificationService.uploadDocument(type, file),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-verification-docs"] });
+      qc.invalidateQueries({ queryKey: ["auth-user"] });
     },
   });
 }

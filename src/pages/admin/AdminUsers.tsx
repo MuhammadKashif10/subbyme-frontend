@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AppPagination } from "@/components/AppPagination";
-import { useAdminUsers, useSetUserStatus, useAdminDeleteUser, useAdminRemoveProfileImage } from "@/hooks/use-api";
+import { useAdminUsers, useSetUserStatus, useSetUserVerified, useAdminDeleteUser, useAdminRemoveProfileImage } from "@/hooks/use-api";
 import { useToast } from "@/hooks/use-toast";
 import { getApiError } from "@/context/AuthContext";
 import { Loader2, Trash2, ShieldCheck, ImageOff } from "lucide-react";
@@ -24,6 +24,7 @@ export default function AdminUsers() {
     limit: PAGE_SIZE,
   });
   const setStatus = useSetUserStatus();
+  const setVerified = useSetUserVerified();
   const deleteUser = useAdminDeleteUser();
   const removeImage = useAdminRemoveProfileImage();
   const { toast } = useToast();
@@ -36,6 +37,15 @@ export default function AdminUsers() {
     try {
       await setStatus.mutateAsync({ id, isActive: !currentlyActive });
       toast({ title: "Updated", description: `User ${currentlyActive ? "suspended" : "activated"}` });
+    } catch (error) {
+      toast({ title: "Error", description: getApiError(error), variant: "destructive" });
+    }
+  };
+
+  const handleToggleVerify = async (id: string, currentlyVerified: boolean) => {
+    try {
+      await setVerified.mutateAsync({ id, isVerified: !currentlyVerified });
+      toast({ title: "Updated", description: `Contractor ${currentlyVerified ? "unverified" : "verified"}` });
     } catch (error) {
       toast({ title: "Error", description: getApiError(error), variant: "destructive" });
     }
@@ -146,7 +156,13 @@ export default function AdminUsers() {
                       {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : ""}
                     </td>
                     <td className="p-3">
-                      <div className="flex gap-1">
+                      <div className="flex flex-wrap gap-1">
+                        {u.role === "contractor" && (
+                          <Button size="sm" variant={u.isVerified ? "outline" : "default"} onClick={() => handleToggleVerify(u._id, u.isVerified ?? false)} title={u.isVerified ? "Remove verification" : "Verify contractor"}>
+                            <ShieldCheck size={14} className="mr-1" />
+                            {u.isVerified ? "Unverify" : "Verify"}
+                          </Button>
+                        )}
                         <Button size="sm" variant="outline" onClick={() => handleToggleStatus(u._id, u.isActive)}>
                           {u.isActive ? "Suspend" : "Activate"}
                         </Button>

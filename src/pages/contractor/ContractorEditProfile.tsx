@@ -11,6 +11,7 @@ import { useUpdateProfile, useToggleAvailability } from "@/hooks/use-api";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { ProfileImageUpload } from "@/components/ProfileImageUpload";
+import { VerificationDocumentsUpload } from "@/components/VerificationDocumentsUpload";
 
 export default function ContractorEditProfile() {
   const { user, refreshUser } = useAuth();
@@ -91,6 +92,9 @@ export default function ContractorEditProfile() {
             </div>
           </div>
         </div>
+
+        {/* Verification Documents */}
+        <VerificationDocumentsUpload />
 
         {/* Profile Form */}
         <form onSubmit={handleSubmit} className="rounded-lg border bg-card p-6 card-shadow">

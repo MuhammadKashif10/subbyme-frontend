@@ -1,14 +1,22 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { adminNavItems } from "./AdminOverview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useAdminUsers, useVerificationDocsForUser } from "@/hooks/use-api";
 import { useToast } from "@/hooks/use-toast";
 import { getApiError } from "@/context/AuthContext";
 import { Loader2, ShieldCheck, ShieldX, Eye } from "lucide-react";
 import type { VerificationDocument } from "@/services/verification-admin.service";
 import { verificationAdminService } from "@/services/verification-admin.service";
+import { verificationService } from "@/services/verification.service";
 
 type VerifyFilter = "all" | "unverified" | "verified";
 
@@ -21,10 +29,13 @@ function getBadge(documents: VerificationDocument[], type: VerificationDocument[
 }
 
 export default function AdminVerifications() {
+  const qc = useQueryClient();
   const { data, isLoading } = useAdminUsers({ role: "contractor", limit: 100 });
   const { toast } = useToast();
   const [filter, setFilter] = useState<VerifyFilter>("all");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [viewDoc, setViewDoc] = useState<{ url: string; title: string } | null>(null);
+  const [loadingDoc, setLoadingDoc] = useState(false);
   const { data: docs } = useVerificationDocsForUser(selectedUserId || undefined);
 
   const allContractors = data?.users ?? [];
@@ -40,6 +51,9 @@ export default function AdminVerifications() {
   const handleApprove = async (docId: string) => {
     try {
       await verificationAdminService.approveDocument(docId);
+      qc.invalidateQueries({ queryKey: ["verification-docs"] });
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: ["admin-stats"] });
       toast({ title: "Approved", description: "Verification document approved." });
     } catch (error) {
       toast({ title: "Error", description: getApiError(error), variant: "destructive" });
@@ -50,6 +64,9 @@ export default function AdminVerifications() {
     const reason = window.prompt("Enter rejection reason (optional):") ?? "Rejected by admin";
     try {
       await verificationAdminService.rejectDocument(docId, reason);
+      qc.invalidateQueries({ queryKey: ["verification-docs"] });
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: ["admin-stats"] });
       toast({ title: "Rejected", description: "Verification document rejected." });
     } catch (error) {
       toast({ title: "Error", description: getApiError(error), variant: "destructive" });
@@ -143,14 +160,30 @@ export default function AdminVerifications() {
                       </div>
                       {doc && (
                         <div className="flex items-center gap-2">
-                          <a
-                            href={doc.documentUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-xs underline"
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-auto px-2 py-1 text-xs"
+                            disabled={loadingDoc}
+                            onClick={async () => {
+                              setLoadingDoc(true);
+                              try {
+                                const docId = doc._id ?? (doc as { id?: string }).id;
+                                if (!docId) throw new Error("Document ID not found");
+                                const { blob } = await verificationService.fetchDocumentBlob(docId);
+                                setViewDoc({
+                                  url: URL.createObjectURL(blob),
+                                  title: `${type === "id" ? "ID" : type === "abn" ? "ABN" : type === "insurance" ? "Insurance" : "Qualification"} Document`,
+                                });
+                              } catch (e) {
+                                toast({ title: "Error", description: getApiError(e), variant: "destructive" });
+                              } finally {
+                                setLoadingDoc(false);
+                              }
+                            }}
                           >
-                            View
-                          </a>
+                            <Eye size={14} className="mr-1" /> View
+                          </Button>
                           {doc.status !== "approved" && (
                             <Button
                               size="sm"
@@ -179,6 +212,37 @@ export default function AdminVerifications() {
           </div>
         </div>
       )}
+
+      <Dialog
+        open={!!viewDoc}
+        onOpenChange={(open) => {
+          if (!open && viewDoc) {
+            URL.revokeObjectURL(viewDoc.url);
+            setViewDoc(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{viewDoc?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 flex flex-col">
+            <iframe
+              src={viewDoc?.url}
+              title={viewDoc?.title}
+              className="w-full h-[70vh] min-h-[400px] border rounded-md bg-muted"
+            />
+            <a
+              href={viewDoc?.url}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 text-sm text-primary hover:underline"
+            >
+              Open in new tab
+            </a>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

@@ -34,8 +34,8 @@ export const adminService = {
   },
 
   async setUserVerified(id: string, isVerified: boolean): Promise<User> {
-    // Deprecated: verification is managed via documents, not direct toggles.
-    throw new Error("Direct verification toggle is not supported. Use document-based verification.");
+    const res = await apiClient.patch(`/admin/users/${id}/verify`, { isVerified });
+    return unwrap(res);
   },
 
   async setSubscription(id: string, status: string | null, plan: string | null): Promise<User> {
