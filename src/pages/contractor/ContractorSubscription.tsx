@@ -205,7 +205,7 @@ export default function ContractorSubscription() {
                     <tr key={tx._id} className="border-b last:border-0">
                       <td className="p-3 text-muted-foreground">{new Date(tx.createdAt).toLocaleDateString()}</td>
                       <td className="p-3 text-foreground capitalize">{tx.type.replace("_", " ")}</td>
-                      <td className="p-3 text-foreground">${(tx.amount / 100).toFixed(2)} {tx.currency}</td>
+                      <td className="p-3 text-foreground">${(tx.amount / 100).toFixed(2)}</td>
                       <td className="p-3">
                         <Badge variant={tx.status === "completed" || tx.status === "released" ? "default" : tx.status === "escrow" ? "secondary" : "outline"} className="capitalize">
                           {tx.status}
