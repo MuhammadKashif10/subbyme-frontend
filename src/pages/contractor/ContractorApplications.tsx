@@ -41,6 +41,21 @@ export default function ContractorApplications() {
     return <Badge variant={variants[status] || "outline"} className="capitalize">{status}</Badge>;
   };
 
+  const jobStatusBadge = (status?: string) => {
+    if (!status) return null;
+    const variants: Record<string, "default" | "destructive" | "outline" | "secondary"> = {
+      open: "outline",
+      in_progress: "default",
+      completed: "secondary",
+      cancelled: "destructive",
+    };
+    return (
+      <Badge variant={variants[status] || "outline"} className="capitalize">
+        Job: {status.replace("_", " ")}
+      </Badge>
+    );
+  };
+
   const counts = {
     all: applications?.length ?? 0,
     pending: applications?.filter((a) => a.status === "pending").length ?? 0,
@@ -100,6 +115,7 @@ export default function ContractorApplications() {
                       <h3 className="font-semibold text-foreground">{listing?.title || "Listing"}</h3>
                       {listing?.category && <Badge variant="secondary">{listing.category}</Badge>}
                       {statusBadge(app.status)}
+                      {jobStatusBadge(listing?.status)}
                     </div>
                     <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                       {listing?.location && (
