@@ -17,12 +17,18 @@ function ApplicationsForListing({ listing }: { listing: Listing }) {
   const updateListing = useUpdateListing();
   const { toast } = useToast();
 
-  const handleAccept = async (appId: string, contractor: User | string) => {
+  const handleAccept = async (appId: string, contractor: User | string, appListingId: string | Listing) => {
     try {
       await updateStatus.mutateAsync({ id: appId, status: "accepted" });
       const contractorId = typeof contractor === "object" ? contractor._id : contractor;
+      const rawId = typeof appListingId === "string" ? appListingId : (appListingId as Listing)?._id;
+      const listingId = (typeof rawId === "string" ? rawId : (rawId as { toString?: () => string })?.toString?.() ?? "").trim();
+      if (!listingId || !/^[a-f0-9]{24}$/i.test(listingId)) {
+        toast({ title: "Error", description: "Invalid listing reference", variant: "destructive" });
+        return;
+      }
       await updateListing.mutateAsync({
-        id: listing._id,
+        id: listingId,
         data: { status: "in_progress", assignedContractorId: contractorId },
       });
       toast({ title: "Accepted", description: "Application accepted and job set to In Progress" });
@@ -102,7 +108,7 @@ function ApplicationsForListing({ listing }: { listing: Listing }) {
                       <div className="mt-3 flex gap-2">
                         <Button
                           size="sm"
-                          onClick={() => handleAccept(app._id, app.contractorId)}
+                          onClick={() => handleAccept(app._id, app.contractorId, app.listingId)}
                           disabled={updateStatus.isPending}
                         >
                           {updateStatus.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle size={14} className="mr-1" />}
