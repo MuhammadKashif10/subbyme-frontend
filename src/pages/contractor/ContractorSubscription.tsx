@@ -173,40 +173,52 @@ export default function ContractorSubscription() {
         </div>
       </div>
 
-      {/* Transaction History */}
-      {transactions && transactions.length > 0 && (
-        <div className="mt-8 max-w-3xl">
-          <h2 className="mb-4 text-lg font-semibold text-foreground flex items-center gap-2">
-            <CreditCard size={18} /> Payment History
-          </h2>
-          <div className="overflow-x-auto rounded-lg border bg-card card-shadow">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-secondary">
-                  <th className="p-3 text-left font-medium text-muted-foreground">Date</th>
-                  <th className="p-3 text-left font-medium text-muted-foreground">Type</th>
-                  <th className="p-3 text-left font-medium text-muted-foreground">Amount</th>
-                  <th className="p-3 text-left font-medium text-muted-foreground">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((tx) => (
-                  <tr key={tx._id} className="border-b last:border-0">
-                    <td className="p-3 text-muted-foreground">{new Date(tx.createdAt).toLocaleDateString()}</td>
-                    <td className="p-3 text-foreground capitalize">{tx.type.replace("_", " ")}</td>
-                    <td className="p-3 text-foreground">${(tx.amount / 100).toFixed(2)} {tx.currency}</td>
-                    <td className="p-3">
-                      <Badge variant={tx.status === "completed" || tx.status === "released" ? "default" : tx.status === "escrow" ? "secondary" : "outline"} className="capitalize">
-                        {tx.status}
-                      </Badge>
-                    </td>
+      {/* Subscription History */}
+      <div className="mt-8 max-w-3xl">
+        <h2 className="mb-4 text-lg font-semibold text-foreground flex items-center gap-2">
+          <CreditCard size={18} /> Subscription History
+        </h2>
+        <div className="overflow-x-auto rounded-lg border bg-card card-shadow">
+          {(() => {
+            const subHistory = (transactions ?? []).filter(
+              (tx) => tx.type === "subscription" || tx.type === "qualification_upgrade"
+            );
+            if (subHistory.length === 0) {
+              return (
+                <div className="p-8 text-center text-muted-foreground text-sm">
+                  No subscription payments yet. Your subscription and qualification upgrade payments will appear here.
+                </div>
+              );
+            }
+            return (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-secondary">
+                    <th className="p-3 text-left font-medium text-muted-foreground">Date</th>
+                    <th className="p-3 text-left font-medium text-muted-foreground">Type</th>
+                    <th className="p-3 text-left font-medium text-muted-foreground">Amount</th>
+                    <th className="p-3 text-left font-medium text-muted-foreground">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {subHistory.map((tx) => (
+                    <tr key={tx._id} className="border-b last:border-0">
+                      <td className="p-3 text-muted-foreground">{new Date(tx.createdAt).toLocaleDateString()}</td>
+                      <td className="p-3 text-foreground capitalize">{tx.type.replace("_", " ")}</td>
+                      <td className="p-3 text-foreground">${(tx.amount / 100).toFixed(2)} {tx.currency}</td>
+                      <td className="p-3">
+                        <Badge variant={tx.status === "completed" || tx.status === "released" ? "default" : tx.status === "escrow" ? "secondary" : "outline"} className="capitalize">
+                          {tx.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            );
+          })()}
         </div>
-      )}
+      </div>
     </DashboardLayout>
   );
 }
