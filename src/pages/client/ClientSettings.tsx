@@ -104,7 +104,7 @@ export default function ClientSettings() {
             </div>
             <div className="space-y-2">
               <Label>Location</Label>
-              <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="e.g. Sydney, NSW" />
+              <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="e.g. Texas, USA" />
             </div>
             <div className="space-y-2">
               <Label>Bio</Label>

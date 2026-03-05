@@ -117,7 +117,7 @@ export default function ContractorEditProfile() {
             </div>
             <div className="space-y-2">
               <Label>Location</Label>
-              <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="e.g. Sydney, NSW" />
+              <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="e.g. Texas,USA" />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
