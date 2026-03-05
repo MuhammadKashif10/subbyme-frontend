@@ -32,9 +32,9 @@ export function Footer() {
           <div>
             <h4 className="mb-3 font-semibold text-foreground">Contact</h4>
             <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-              <span>hello@subbyme.com.au</span>
+              <span>hello@subbyme.com</span>
               <span>1300 SUB BYM</span>
-              <span>Sydney, Australia</span>
+              <span>USA</span>
             </div>
           </div>
         </div>
