@@ -16,10 +16,6 @@ const faqs = [
     a: "SubbyMe uses secure payments through Stripe. For job payments, funds are held in escrow until the work is complete, protecting both clients and contractors. Contractors pay a weekly subscription to access jobs and messaging.",
   },
   {
-    q: "What if I'm not satisfied with the work?",
-    a: "We encourage open communication throughout the project. If issues arise, our support team can help mediate. Escrow payments can be released only after your approval, giving you control over when contractors get paid.",
-  },
-  {
     q: "How much does it cost for contractors to join?",
     a: "Contractors can subscribe from $10/week for our Standard plan, which includes profile visibility, up to 20 messages per month, and job applications. Our Premium plan at $25/week offers unlimited messages and priority placement.",
   },
