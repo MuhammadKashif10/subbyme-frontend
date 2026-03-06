@@ -21,9 +21,8 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <nav className="container-main flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-lg">S</div>
-          <span className="text-xl font-bold text-foreground">SubbyMe</span>
+        <Link to="/" className="flex items-center">
+          <img src="/subbyme-logo.png" alt="SubbyMe" className="h-9 object-contain" />
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">
